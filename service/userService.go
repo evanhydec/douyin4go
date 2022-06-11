@@ -7,7 +7,7 @@ import (
 )
 
 func Register(user *entity.User) bool {
-	if dao.GetUserByNameAndPwd(user) {
+	if dao.GetUserByName(user.Name) {
 		return false
 	}
 	dao.CreateUser(user)
@@ -18,16 +18,15 @@ func Login(user *entity.User) bool {
 	return dao.GetUserByNameAndPwd(user)
 }
 
-func UserInfo(uid string, token string) *entity.User {
+func UserInfo(uid string, token int) *entity.User {
 	if uid == "" {
 		return &entity.User{}
 	}
 
 	user, _ := strconv.Atoi(uid)
-	self, _ := strconv.Atoi(token)
 
 	res := dao.GetUserById(user)
-	res.IsFollow = dao.CheckRelation(uint(self), uint(user))
+	res.IsFollow = dao.CheckRelation(uint(token), uint(user))
 
 	return res
 }

@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/RaymondCode/simple-demo/dao"
 	"github.com/RaymondCode/simple-demo/entity"
-	"strconv"
 	"time"
 )
 
@@ -29,23 +28,21 @@ func VideoList(self uint, uid uint) []entity.Video {
 	return res
 }
 
-func Feed(token string, timestamp int64) []entity.Video {
+func Feed(token int, timestamp int64) []entity.Video {
 	t := time.Unix(timestamp, 0)
 	videos := dao.GetVideoByTime(t)
 	var res []entity.Video
-	if token == "0" {
+	if token == 0 {
 		return videos
 	}
 
-	user, _ := strconv.Atoi(token)
-
-	follows := dao.GetFollow(uint(user))
+	follows := dao.GetFollow(uint(token))
 	follow := make(map[uint]bool, len(follows))
 	for _, followe := range follows {
 		follow[followe.FollowID] = true
 	}
 
-	favourites := dao.GetFavouriteVideoByUserID(uint(user))
+	favourites := dao.GetFavouriteVideoByUserID(uint(token))
 	favourite := make(map[uint]bool, len(favourites))
 	for _, favourit := range favourites {
 		favourite[favourit.ID] = true

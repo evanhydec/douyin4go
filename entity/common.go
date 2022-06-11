@@ -44,7 +44,7 @@ type User struct {
 	FollowCount   uint64         `json:"follow_count"`
 	FollowerCount uint64         `json:"follower_count"`
 	IsFollow      bool           `json:"is_follow"`
-	Passwd        string         `json:"-" gorm:"type:varchar(20);not null"`
+	Passwd        string         `json:"-" gorm:"type:varchar(65);not null"`
 	CreatedAt     time.Time      `json:"-"`
 	UpdatedAt     time.Time      `json:"-"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`

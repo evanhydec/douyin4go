@@ -3,14 +3,17 @@ package controller
 import (
 	"github.com/RaymondCode/simple-demo/entity"
 	"github.com/RaymondCode/simple-demo/service"
+	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // FavoriteAction no practical effect, just check if token is valid
 func FavoriteAction(c *gin.Context) {
 	token := c.Query("token")
-	user := service.UserInfo(token, token)
+	self := utils.ParseToken(token)
+	user := service.UserInfo(strconv.Itoa(self.ID), self.ID)
 	if user.IsEmpty() {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
@@ -31,8 +34,9 @@ func FavoriteAction(c *gin.Context) {
 // FavoriteList all users have same favorite video list
 func FavoriteList(c *gin.Context) {
 	token := c.Query("token")
+	self := utils.ParseToken(token)
 	uid := c.Query("user_id")
-	user := service.UserInfo(uid, token)
+	user := service.UserInfo(uid, self.ID)
 	if user.IsEmpty() {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return

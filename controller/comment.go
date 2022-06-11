@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/RaymondCode/simple-demo/entity"
 	"github.com/RaymondCode/simple-demo/service"
+	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -20,7 +21,8 @@ type CommentActionResponse struct {
 // CommentAction no practical effect, just check if token is valid
 func CommentAction(c *gin.Context) {
 	token := c.Query("token")
-	user := service.UserInfo(token, token)
+	self := utils.ParseToken(token)
+	user := service.UserInfo(token, self.ID)
 	if user.IsEmpty() {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return

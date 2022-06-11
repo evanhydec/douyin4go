@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/RaymondCode/simple-demo/entity"
 	"github.com/RaymondCode/simple-demo/service"
+	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -32,7 +33,9 @@ func Feed(c *gin.Context) {
 
 	token := c.Query("token")
 
-	videos := service.Feed(token, timestamp)
+	self := utils.ParseToken(token)
+
+	videos := service.Feed(self.ID, timestamp)
 
 	c.JSON(http.StatusOK, FeedResponse{
 		Response:  entity.Response{StatusCode: 0},

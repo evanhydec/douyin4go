@@ -28,6 +28,13 @@ func GetUserByNameAndPwd(user *entity.User) bool {
 	return true
 }
 
+func GetUserByName(name string) bool {
+	db := utils.GetDB()
+	res := entity.User{}
+	db.Where("name = ?", name).Find(&res)
+	return !res.IsEmpty()
+}
+
 func CreateUser(user *entity.User) {
 	db := utils.GetDB()
 	db.Create(&user)

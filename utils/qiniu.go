@@ -12,7 +12,7 @@ var (
 	serectKey = "2AqwWLBVXuytx-6cHCbAxTBdyZPcVrzHBqXzfstC"
 	bucket    = "doushenlocal"                      // 空间名称
 	imgUrl    = "http://rczr8vfwz.bkt.clouddn.com/" //cdn的url
-	path      = "videos/"                           //空间下视频存放路径
+	savePath  = "videos/"                           //空间下视频存放路径
 )
 
 func UploadToQiNiu(file *multipart.FileHeader) (int, string) {
@@ -43,7 +43,7 @@ func UploadToQiNiu(file *multipart.FileHeader) (int, string) {
 	putExtra := storage.PutExtra{} // 额外参数
 
 	// 上传 自定义key，可以指定上传目录及文件名和后缀，
-	key := path + file.Filename // 上传路径，如果当前目录中已存在相同文件，则返回上传失败错误
+	key := savePath + file.Filename // 上传路径，如果当前目录中已存在相同文件，则返回上传失败错误
 	err = formUploader.Put(context.Background(), &ret, upToken, key, src, file.Size, &putExtra)
 
 	// 以默认key方式上传

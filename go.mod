@@ -3,11 +3,13 @@ module github.com/RaymondCode/simple-demo
 go 1.17
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/garyburd/redigo v1.6.3
 	github.com/gin-gonic/gin v1.7.7
 	github.com/qiniu/go-sdk/v7 v7.12.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/u2takey/ffmpeg-go v0.4.1
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gorm v1.23.5

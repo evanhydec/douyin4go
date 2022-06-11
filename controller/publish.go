@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"strconv"
 )
 
 var (
@@ -25,8 +26,8 @@ type VideoListResponse struct {
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
 	token := c.PostForm("token")
-
-	user := service.UserInfo(token, token)
+	self := utils.ParseToken(token)
+	user := service.UserInfo(token, self.ID)
 	if user.IsEmpty() {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
@@ -94,8 +95,9 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 	token := c.Query("token")
 	uid := c.Query("user_id")
-	self := service.UserInfo(token, token)
-	user := service.UserInfo(uid, token)
+	t := utils.ParseToken(token)
+	self := service.UserInfo(strconv.Itoa(t.ID), t.ID)
+	user := service.UserInfo(uid, t.ID)
 	if user.IsEmpty() {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
