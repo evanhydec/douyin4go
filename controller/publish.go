@@ -30,7 +30,6 @@ func init() {
 		panic("配置文件获取失败")
 	}
 	url = f.Section("publish").Key("Url").String()
-	fmt.Println(url)
 }
 
 // Publish check token then save upload file to public directory
