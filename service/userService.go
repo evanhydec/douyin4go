@@ -19,7 +19,7 @@ func Login(user *entity.User) bool {
 }
 
 func UserInfo(uid string, token int) *entity.User {
-	if uid == "" {
+	if uid == "0" {
 		return &entity.User{}
 	}
 

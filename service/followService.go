@@ -6,34 +6,32 @@ import (
 	"strconv"
 )
 
-func FollowAction(sid string, mid string, t string) bool {
-	follower, _ := strconv.Atoi(sid)
+func FollowAction(sid int, mid string, t string) bool {
 	follow, _ := strconv.Atoi(mid)
 	if u1 := dao.GetUserById(follow); u1.IsEmpty() {
 		return false
 	}
-	if u2 := dao.GetUserById(follower); u2.IsEmpty() {
+	if u2 := dao.GetUserById(sid); u2.IsEmpty() {
 		return false
 	}
 	if t == "1" {
-		if dao.CheckRelation(uint(follower), uint(follow)) {
+		if dao.CheckRelation(uint(sid), uint(follow)) {
 			return false
 		}
-		dao.CreateFollowTx(uint(follow), uint(follower))
+		dao.CreateFollowTx(uint(follow), uint(sid))
 	} else {
-		dao.DeleteFollowTx(uint(follow), uint(follower))
+		dao.DeleteFollowTx(uint(follow), uint(sid))
 	}
 	dao.RedisDeleteUserById(follow)
-	dao.RedisDeleteUserById(follower)
+	dao.RedisDeleteUserById(sid)
 	return true
 }
 
-func GetFollow(id uint, token string) []entity.User {
+func GetFollow(id uint, token int) []entity.User {
 	follows := dao.GetFollow(id)
 	var res []entity.User
 
-	self, _ := strconv.Atoi(token)
-	myFollows := dao.GetFollow(uint(self))
+	myFollows := dao.GetFollow(uint(token))
 	mfs := make(map[uint]bool, len(myFollows))
 	for _, follow := range myFollows {
 		mfs[follow.FollowID] = true
@@ -46,12 +44,11 @@ func GetFollow(id uint, token string) []entity.User {
 	return res
 }
 
-func GetFollower(id uint, token string) []entity.User {
+func GetFollower(id uint, token int) []entity.User {
 	followers := dao.GetFollower(id)
 	var res []entity.User
 
-	self, _ := strconv.Atoi(token)
-	follows := dao.GetFollow(uint(self))
+	follows := dao.GetFollow(uint(token))
 	fs := make(map[uint]bool, len(follows))
 	for _, follow := range follows {
 		fs[follow.FollowID] = true

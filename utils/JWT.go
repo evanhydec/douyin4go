@@ -40,6 +40,13 @@ func GenerateToken(id int, authority int) (string, error) {
 
 // ParseToken 解析Token
 func ParseToken(tokenString string) *Claims {
+	if tokenString == "" {
+		return &Claims{
+			ID:             0,
+			Authority:      1,
+			StandardClaims: jwt.StandardClaims{},
+		}
+	}
 	//解析token
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return secret, nil
@@ -78,11 +85,5 @@ func StringToByteSlice(s string) []byte {
 	tmp2 := [3]uintptr{tmp1[0], tmp1[1], tmp1[1]}
 
 	return *(*[]byte)(unsafe.Pointer(&tmp2))
-
-}
-
-func ByteSliceToString(bytes []byte) string {
-
-	return *(*string)(unsafe.Pointer(&bytes))
 
 }

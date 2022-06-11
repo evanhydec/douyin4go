@@ -41,7 +41,7 @@ func FavoriteList(c *gin.Context) {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
-	videos := service.FavouriteList(user.ID, token)
+	videos := service.FavouriteList(user.ID, self.ID)
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: entity.Response{
 			StatusCode: 0,

@@ -6,6 +6,7 @@ import (
 	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type CommentListResponse struct {
@@ -22,7 +23,7 @@ type CommentActionResponse struct {
 func CommentAction(c *gin.Context) {
 	token := c.Query("token")
 	self := utils.ParseToken(token)
-	user := service.UserInfo(token, self.ID)
+	user := service.UserInfo(strconv.Itoa(self.ID), self.ID)
 	if user.IsEmpty() {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return

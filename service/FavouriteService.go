@@ -20,10 +20,9 @@ func FavouriteAction(videoId string, uid uint, t string) bool {
 	return dao.VideoFavouriteTx(t == "1", int(uid), vid)
 }
 
-func FavouriteList(uid uint, token string) []entity.Video {
-	self, _ := strconv.Atoi(token)
+func FavouriteList(uid uint, token int) []entity.Video {
 
-	follows := dao.GetFollow(uint(self))
+	follows := dao.GetFollow(uint(token))
 	follow := make(map[uint]bool, len(follows))
 	for _, followe := range follows {
 		follow[followe.FollowID] = true

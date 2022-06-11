@@ -24,7 +24,7 @@ func RelationAction(c *gin.Context) {
 	}
 
 	t := c.Query("action_type")
-	res := service.FollowAction(token, toUser, t)
+	res := service.FollowAction(self.ID, toUser, t)
 	if res {
 		c.JSON(http.StatusOK, entity.Response{
 			StatusCode: 0,
@@ -48,7 +48,7 @@ func FollowList(c *gin.Context) {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 	}
 
-	follows := service.GetFollow(user.ID, token)
+	follows := service.GetFollow(user.ID, self.ID)
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: entity.Response{
 			StatusCode: 0,
@@ -67,7 +67,7 @@ func FollowerList(c *gin.Context) {
 		c.JSON(http.StatusOK, entity.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 	}
 
-	followers := service.GetFollower(user.ID, token)
+	followers := service.GetFollower(user.ID, self.ID)
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: entity.Response{
 			StatusCode: 0,
