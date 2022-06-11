@@ -23,6 +23,7 @@ func GetUserByNameAndPwd(user *entity.User) bool {
 	db := utils.GetDB()
 	tx := db.Where("name = ? and passwd = ?", user.Name, user.Passwd).First(&user)
 	if tx.Error != nil {
+		utils.LogrusObj.Info(tx.Error)
 		return false
 	}
 	return true
@@ -55,6 +56,7 @@ func UpdateUser(user *entity.User) bool {
 	db := utils.GetDB()
 	save := db.Save(&user)
 	if save.Error != nil {
+		utils.LogrusObj.Info(save.Error)
 		return false
 	}
 	return true

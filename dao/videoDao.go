@@ -10,6 +10,7 @@ func CreateVideo(video *entity.Video) bool {
 	db := utils.GetDB()
 	create := db.Create(video)
 	if create.Error != nil {
+		utils.LogrusObj.Info(create.Error)
 		return false
 	}
 	return true
@@ -26,6 +27,7 @@ func DeleteVideoById(video *entity.Video) bool {
 	db := utils.GetDB()
 	tx := db.Where("id = ?", video.ID).Delete(video)
 	if tx.Error != nil {
+		utils.LogrusObj.Info(tx.Error)
 		return false
 	}
 	return true
@@ -36,6 +38,7 @@ func UpdateVideo(video *entity.Video) bool {
 	db := utils.GetDB()
 	save := db.Save(&video)
 	if save.Error != nil {
+		utils.LogrusObj.Info(save.Error)
 		return false
 	}
 	return true

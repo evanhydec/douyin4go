@@ -7,6 +7,7 @@ import (
 	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
+	"gopkg.in/ini.v1"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -14,13 +15,22 @@ import (
 )
 
 var (
-	//url = "http://124.222.224.182:8080/"
-	url = "http://192.168.0.105:8080/"
+	url string
 )
 
 type VideoListResponse struct {
 	entity.Response
 	VideoList []entity.Video `json:"video_list"`
+}
+
+func init() {
+	f, err := ini.Load("./conf.ini")
+	if err != nil {
+		utils.LogrusObj.Info(err)
+		panic("配置文件获取失败")
+	}
+	url = f.Section("publish").Key("Url").String()
+	fmt.Println(url)
 }
 
 // Publish check token then save upload file to public directory

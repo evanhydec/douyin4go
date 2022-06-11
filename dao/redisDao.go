@@ -22,15 +22,16 @@ func RedisSetUser(user entity.User) bool {
 	var err error
 
 	if data, err = json.Marshal(user); err != nil {
+		utils.LogrusObj.Info(err)
 		fmt.Println(err)
 		return false
 	}
 
 	if _, err = conn.Do("set", key, data, "EX", slow); err != nil {
+		utils.LogrusObj.Info(err)
 		fmt.Println(err)
 		return false
 	}
-	fmt.Println("redis新增user")
 	return true
 }
 
@@ -45,9 +46,9 @@ func RedisGetUserById(id int) (*entity.User, bool) {
 	if len(r) > 0 {
 		if err = json.Unmarshal(r, &res); err != nil {
 			fmt.Println(err)
+			utils.LogrusObj.Info(err)
 			return nil, true
 		}
-		fmt.Println("redis获得user")
 		return res, false
 	}
 	return nil, true
@@ -60,10 +61,10 @@ func RedisDeleteUserById(id int) bool {
 	keys := fmt.Sprintf("user:%v", id)
 	_, err := conn.Do("del", keys)
 	if err != nil {
+		utils.LogrusObj.Info(err)
 		fmt.Println(err)
 		return false
 	}
-	fmt.Println("redis删除user")
 	return true
 }
 

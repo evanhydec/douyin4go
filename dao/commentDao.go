@@ -12,6 +12,7 @@ func DeleteComment(comment *entity.Comment) int {
 	var com entity.Comment
 	db.Where("id = ?", comment.ID).First(&com)
 	if err := db.Delete(&comment).Error; err != nil {
+		utils.LogrusObj.Info(err)
 		return 0
 	}
 	VideoComment(false, int(comment.Video.ID))
@@ -23,10 +24,12 @@ func VideoComment(t bool, id int) bool {
 	db := utils.GetDB()
 	if t {
 		if err := db.Model(entity.Video{}).Where("id = ? ", id).Update("comment_count", gorm.Expr("comment_count + ?", 1)).Error; err != nil {
+			utils.LogrusObj.Info(err)
 			return false
 		}
 	} else {
 		if err := db.Model(entity.Video{}).Where("id = ? ", id).Update("comment_count", gorm.Expr("comment_count - ?", 1)).Error; err != nil {
+			utils.LogrusObj.Info(err)
 			return false
 		}
 	}
@@ -37,11 +40,13 @@ func CreateCommentTx(comment *entity.Comment) bool {
 	tx := utils.GetDB().Begin()
 	if err := tx.Create(&comment).Error; err != nil {
 		fmt.Println("评论创建出错,进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
 	if err := tx.Model(entity.Video{}).Where("id = ? ", comment.Video.ID).Update("comment_count", gorm.Expr("comment_count + ?", 1)).Error; err != nil {
 		fmt.Println("修改评论记录出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
@@ -53,12 +58,14 @@ func DeleteCommentTx(comment *entity.Comment) int {
 	tx := utils.GetDB().Begin()
 	id := comment.VideoId
 	if err := tx.Delete(&comment).Error; err != nil {
+		utils.LogrusObj.Info(err)
 		fmt.Println("删除评论出错，进行回滚")
 		tx.Rollback()
 		return 0
 	}
 	if err := tx.Model(entity.Video{}).Where("id = ? ", id).Update("comment_count", gorm.Expr("comment_count - ?", 1)).Error; err != nil {
 		fmt.Println("更新评论数出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return 0
 	}

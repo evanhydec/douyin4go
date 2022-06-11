@@ -11,16 +11,19 @@ func CreateFollowTx(mid uint, sid uint) bool {
 	tx := utils.GetDB().Begin()
 	if err := tx.Model(entity.User{}).Where("id = ? ", sid).Update("follow_count", gorm.Expr("follow_count + ?", 1)).Error; err != nil {
 		fmt.Println("follower修改出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
 	if err := tx.Model(entity.User{}).Where("id = ? ", mid).Update("follower_count", gorm.Expr("follower_count + ?", 1)).Error; err != nil {
 		fmt.Println("follow修改出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
 	if err := tx.Create(&entity.Follow{FollowerID: sid, FollowID: mid}).Error; err != nil {
 		fmt.Println("创建follow记录出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
@@ -32,16 +35,19 @@ func DeleteFollowTx(mid uint, sid uint) bool {
 	tx := utils.GetDB().Begin()
 	if err := tx.Where("follower_id = ? and follow_id = ?", sid, mid).Delete(entity.Follow{}).Error; err != nil {
 		fmt.Println("删除follow记录出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
 	if err := tx.Model(entity.User{}).Where("id = ? ", sid).Update("follow_count", gorm.Expr("follow_count - ?", 1)).Error; err != nil {
 		fmt.Println("follower修改出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
 	if err := tx.Model(entity.User{}).Where("id = ? ", mid).Update("follower_count", gorm.Expr("follower_count - ?", 1)).Error; err != nil {
 		fmt.Println("follow修改出错，进行回滚")
+		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}

@@ -16,16 +16,19 @@ func ReadFrameAsJpeg(inFileName string, frameNum int, filename string) bool {
 		WithOutput(buf, os.Stdout).
 		Run()
 	if err != nil {
+		LogrusObj.Info(err)
 		return false
 	}
 
 	img, err := imaging.Decode(buf)
 	if err != nil {
+		LogrusObj.Info(err)
 		return false
 	}
 
 	err = imaging.Save(img, fmt.Sprintf("./public/covers/%s", filename))
 	if err != nil {
+		LogrusObj.Info(err)
 		return false
 	}
 	return true
