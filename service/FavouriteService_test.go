@@ -20,5 +20,5 @@ func TestFavouriteActionTx(t *testing.T) {
 }
 
 func TestFavouriteList(t *testing.T) {
-	fmt.Println(FavouriteList(0, "2"))
+	fmt.Println(FavouriteList(0, 2))
 }

@@ -4,16 +4,30 @@ import (
 	"context"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
+	"gopkg.in/ini.v1"
 	"mime/multipart"
 )
 
 var (
-	accessKey = "BaYnS_HE5c4NjVq_r0NxpbNBaQScNRahIVRTYhx3" // 秘钥对
-	serectKey = "2AqwWLBVXuytx-6cHCbAxTBdyZPcVrzHBqXzfstC"
-	bucket    = "doushenlocal"                      // 空间名称
-	imgUrl    = "http://rczr8vfwz.bkt.clouddn.com/" //cdn的url
-	savePath  = "videos/"                           //空间下视频存放路径
+	accessKey string // 秘钥对
+	serectKey string
+	bucket    string // 空间名称
+	imgUrl    string //cdn的url
+	savePath  string //空间下视频存放路径
 )
+
+func init() {
+	file, err := ini.Load("./conf.ini")
+	if err != nil {
+		LogrusObj.Info(err)
+		panic("配置文件有误")
+	}
+	accessKey = file.Section("qiniu").Key("accessKey").String()
+	serectKey = file.Section("qiniu").Key("serectKey").String()
+	bucket = file.Section("qiniu").Key("bucket").String()
+	imgUrl = file.Section("qiniu").Key("imgUrl").String()
+	savePath = file.Section("qiniu").Key("savePath").String()
+}
 
 func UploadToQiNiu(file *multipart.FileHeader) (int, string) {
 

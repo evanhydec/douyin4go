@@ -22,5 +22,5 @@ func TestRegister(t *testing.T) {
 }
 
 func TestUserInfo(t *testing.T) {
-	fmt.Println(UserInfo("5", "5"))
+	fmt.Println(UserInfo("5", 5))
 }
