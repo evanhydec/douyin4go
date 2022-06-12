@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"gopkg.in/ini.v1"
 	"strings"
@@ -30,8 +29,7 @@ func init() {
 	port = file.Section("redis").Key("port").String()
 
 	duration, _ := time.ParseDuration(idleTimeOut)
-	path := strings.Join([]string{"http://", url, ":", port}, "")
-	fmt.Println(path)
+	path := strings.Join([]string{url, ":", port}, "")
 	pool = &redis.Pool{ //实例化一个连接池
 		MaxIdle:     maxIdle,
 		MaxActive:   maxActive,
