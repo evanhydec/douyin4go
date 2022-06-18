@@ -3,7 +3,6 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 	"unsafe"
@@ -57,8 +56,6 @@ func ParseToken(tokenString string) *Claims {
 	}
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
-		//panic("token is valid")
-		fmt.Println("token is valid")
 		return nil
 	}
 	return claims

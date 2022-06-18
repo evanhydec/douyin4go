@@ -52,39 +52,48 @@ func Publish(c *gin.Context) {
 	}
 	title := c.PostForm("title")
 
-	//使用本地存储
-	ext := path.Ext(filepath.Base(data.Filename))
-	f := uuid.NewV4()
-	finalName := fmt.Sprintf("%s%s", f, ext)
-	fmt.Println(finalName)
-	saveFile := filepath.Join("./public/videos/", finalName)
+	var coverUrl, playUrl string
 
-	if err := c.SaveUploadedFile(data, saveFile); err != nil {
-		c.JSON(http.StatusOK, entity.Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
+	file, err := ini.Load("./conf.ini")
+	if err != nil {
+		utils.LogrusObj.Info(err)
+		panic("配置文件有误")
 	}
+	method := file.Section("publish").Key("method").String()
+	if method == "local" {
+		//使用本地存储
+		ext := path.Ext(filepath.Base(data.Filename))
+		f := uuid.NewV4()
+		finalName := fmt.Sprintf("%s%s", f, ext)
+		saveFile := filepath.Join("./public/videos/", finalName)
 
-	name := fmt.Sprintf("%s.jpeg", f)
-	fmt.Println(name)
+		if err := c.SaveUploadedFile(data, saveFile); err != nil {
+			c.JSON(http.StatusOK, entity.Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			})
+			return
+		}
 
-	if flag := utils.ReadFrameAsJpeg(saveFile, 5, name); !flag {
-		panic("cover wrong")
+		name := fmt.Sprintf("%s.jpeg", f)
+
+		if flag := utils.ReadFrameAsJpeg(saveFile, 5, name); !flag {
+			panic("cover wrong")
+		}
+		coverUrl = fmt.Sprintf("%sstatic/covers/%s", url, name)
+		playUrl = fmt.Sprintf("%sstatic/videos/%s", url, finalName)
+	} else {
+		//使用七牛
+		var code int
+		code, playUrl = utils.UploadToQiNiu(data)
+		if code != 0 {
+			c.JSON(http.StatusOK, entity.Response{
+				StatusCode: 1,
+				StatusMsg:  playUrl,
+			})
+		}
+		coverUrl = fmt.Sprintf("%s?vframe/jpg/offset/0", playUrl)
 	}
-	coverUrl := fmt.Sprintf("%sstatic/covers/%s", url, name)
-	playUrl := fmt.Sprintf("%sstatic/videos/%s", url, finalName)
-
-	//使用七牛
-	//code, playUrl := utils.UploadToQiNiu(data)
-	//if code != 0 {
-	//	c.JSON(http.StatusOK, entity.Response{
-	//		StatusCode: 1,
-	//		StatusMsg:  playUrl,
-	//	})
-	//}
-	//coverUrl := fmt.Sprintf("%s?vframe/jpg/offset/0", playUrl)
 
 	video := entity.Video{
 		Title:    title,

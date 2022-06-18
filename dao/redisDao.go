@@ -6,11 +6,19 @@ import (
 	"github.com/RaymondCode/simple-demo/entity"
 	"github.com/RaymondCode/simple-demo/utils"
 	"github.com/garyburd/redigo/redis"
+	"gopkg.in/ini.v1"
 )
 
-var (
-	slow = 600 //用户信息、关注信息、点赞信息
-)
+var slow int //缓存失效时间
+
+func init() {
+	file, err := ini.Load("./conf.ini")
+	if err != nil {
+		utils.LogrusObj.Info(err)
+		panic("配置文件有误")
+	}
+	slow, _ = file.Section("redis").Key("ttl").Int()
+}
 
 func RedisSetUser(user entity.User) bool {
 	conn := utils.GetConn()
@@ -23,13 +31,11 @@ func RedisSetUser(user entity.User) bool {
 
 	if data, err = json.Marshal(user); err != nil {
 		utils.LogrusObj.Info(err)
-		fmt.Println(err)
 		return false
 	}
 
 	if _, err = conn.Do("set", key, data, "EX", slow); err != nil {
 		utils.LogrusObj.Info(err)
-		fmt.Println(err)
 		return false
 	}
 	return true
@@ -45,7 +51,6 @@ func RedisGetUserById(id int) (*entity.User, bool) {
 	r, err := redis.Bytes(conn.Do("get", keys))
 	if len(r) > 0 {
 		if err = json.Unmarshal(r, &res); err != nil {
-			fmt.Println(err)
 			utils.LogrusObj.Info(err)
 			return nil, true
 		}
@@ -62,7 +67,6 @@ func RedisDeleteUserById(id int) bool {
 	_, err := conn.Do("del", keys)
 	if err != nil {
 		utils.LogrusObj.Info(err)
-		fmt.Println(err)
 		return false
 	}
 	return true
