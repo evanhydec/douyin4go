@@ -8,17 +8,17 @@ import (
 
 func CreateFollowTx(mid uint, sid uint) bool {
 	tx := utils.GetDB().Begin()
-	if err := tx.Model(entity.User{}).Where("id = ? ", sid).Update("follow_count", gorm.Expr("follow_count + ?", 1)).Error; err != nil {
+	if err := tx.Model(entity.User{}).Set("gorm:query_option", "FOR UPDATE").Where("id = ? ", sid).Update("follow_count", gorm.Expr("follow_count + ?", 1)).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
-	if err := tx.Model(entity.User{}).Where("id = ? ", mid).Update("follower_count", gorm.Expr("follower_count + ?", 1)).Error; err != nil {
+	if err := tx.Model(entity.User{}).Set("gorm:query_option", "FOR UPDATE").Where("id = ? ", mid).Update("follower_count", gorm.Expr("follower_count + ?", 1)).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
-	if err := tx.Create(&entity.Follow{FollowerID: sid, FollowID: mid}).Error; err != nil {
+	if err := tx.Set("gorm:query_option", "FOR UPDATE").Create(&entity.Follow{FollowerID: sid, FollowID: mid}).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
@@ -29,17 +29,17 @@ func CreateFollowTx(mid uint, sid uint) bool {
 
 func DeleteFollowTx(mid uint, sid uint) bool {
 	tx := utils.GetDB().Begin()
-	if err := tx.Where("follower_id = ? and follow_id = ?", sid, mid).Delete(entity.Follow{}).Error; err != nil {
+	if err := tx.Set("gorm:query_option", "FOR UPDATE").Where("follower_id = ? and follow_id = ?", sid, mid).Delete(entity.Follow{}).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
-	if err := tx.Model(entity.User{}).Where("id = ? ", sid).Update("follow_count", gorm.Expr("follow_count - ?", 1)).Error; err != nil {
+	if err := tx.Model(entity.User{}).Where("id = ? ", sid).Set("gorm:query_option", "FOR UPDATE").Update("follow_count", gorm.Expr("follow_count - ?", 1)).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
-	if err := tx.Model(entity.User{}).Where("id = ? ", mid).Update("follower_count", gorm.Expr("follower_count - ?", 1)).Error; err != nil {
+	if err := tx.Model(entity.User{}).Set("gorm:query_option", "FOR UPDATE").Where("id = ? ", mid).Update("follower_count", gorm.Expr("follower_count - ?", 1)).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false

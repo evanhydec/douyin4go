@@ -37,12 +37,12 @@ func VideoComment(t bool, id int) bool {
 
 func CreateCommentTx(comment *entity.Comment) bool {
 	tx := utils.GetDB().Begin()
-	if err := tx.Create(&comment).Error; err != nil {
+	if err := tx.Set("gorm:query_option", "FOR UPDATE").Create(&comment).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
 	}
-	if err := tx.Model(entity.Video{}).Where("id = ? ", comment.Video.ID).Update("comment_count", gorm.Expr("comment_count + ?", 1)).Error; err != nil {
+	if err := tx.Model(entity.Video{}).Set("gorm:query_option", "FOR UPDATE").Where("id = ? ", comment.Video.ID).Update("comment_count", gorm.Expr("comment_count + ?", 1)).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return false
@@ -54,12 +54,12 @@ func CreateCommentTx(comment *entity.Comment) bool {
 func DeleteCommentTx(comment *entity.Comment) int {
 	tx := utils.GetDB().Begin()
 	id := comment.VideoId
-	if err := tx.Delete(&comment).Error; err != nil {
+	if err := tx.Set("gorm:query_option", "FOR UPDATE").Delete(&comment).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return 0
 	}
-	if err := tx.Model(entity.Video{}).Where("id = ? ", id).Update("comment_count", gorm.Expr("comment_count - ?", 1)).Error; err != nil {
+	if err := tx.Model(entity.Video{}).Set("gorm:query_option", "FOR UPDATE").Where("id = ? ", id).Update("comment_count", gorm.Expr("comment_count - ?", 1)).Error; err != nil {
 		utils.LogrusObj.Info(err)
 		tx.Rollback()
 		return 0

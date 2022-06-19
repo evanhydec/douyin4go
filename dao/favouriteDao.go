@@ -9,23 +9,23 @@ import (
 func VideoFavouriteTx(t bool, id int, vid int) bool {
 	tx := utils.GetDB().Begin()
 	if t {
-		if err := tx.Model(entity.Video{}).Where("id = ? ", vid).Update("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
+		if err := tx.Model(entity.Video{}).Set("gorm:query_option", "FOR UPDATE").Where("id = ? ", vid).Update("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error; err != nil {
 			utils.LogrusObj.Info(err)
 			tx.Rollback()
 			return false
 		}
-		if e := tx.Create(&entity.Favorite{UserID: uint(id), VideoID: uint(vid)}).Error; e != nil {
+		if e := tx.Set("gorm:query_option", "FOR UPDATE").Create(&entity.Favorite{UserID: uint(id), VideoID: uint(vid)}).Error; e != nil {
 			utils.LogrusObj.Info(e)
 			tx.Rollback()
 			return false
 		}
 	} else {
-		if err := tx.Model(entity.Video{}).Where("id = ? ", vid).Update("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error; err != nil {
+		if err := tx.Model(entity.Video{}).Where("id = ? ", vid).Set("gorm:query_option", "FOR UPDATE").Update("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error; err != nil {
 			utils.LogrusObj.Info(err)
 			tx.Rollback()
 			return false
 		}
-		if err := tx.Where("user_id = ? and video_id = ?", id, vid).Delete(entity.Favorite{}).Error; err != nil {
+		if err := tx.Where("user_id = ? and video_id = ?", id, vid).Set("gorm:query_option", "FOR UPDATE").Delete(entity.Favorite{}).Error; err != nil {
 			utils.LogrusObj.Info(err)
 			tx.Rollback()
 			return false
